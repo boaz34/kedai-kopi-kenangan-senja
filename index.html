@@ -1,133 +1,626 @@
-<!DOCTYPE html>
-<html lang="en">
-  
+<!doctype html>
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kopi Kenangan Senja</title>
+    <meta
+      name="description"
+      content="Kedai Kopi Kenangan Senja - Menyajikan perpaduan biji kopi pilihan terbaik dengan cita rasa autentik dan aroma yang memikat. Pesan sekarang via WhatsApp!"
+    />
+    <meta
+      name="keywords"
+      content="kedai kopi, kopi kenangan senja, kopi asli, arabica, robusta, espresso, latte, cappuccino, kafe bandung"
+    />
+    <meta name="robots" content="index, follow" />
+    <meta
+      property="og:title"
+      content="Kedai Kopi Kenangan Senja | Kenikmatan dalam Setiap Tegukan"
+    />
+    <meta
+      property="og:description"
+      content="Nikmati kopi pilihan terbaik dari Kedai Kopi Kenangan Senja. Pesan sekarang!"
+    />
+    <meta property="og:type" content="website" />
+    <title>Kedai Kopi Kenangan Senja | Kenikmatan dalam Setiap Tegukan</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,300;0,400;0,700;1,700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,300;0,400;0,600;0,700;1,700&display=swap"
       rel="stylesheet"
     />
 
-    <!-- Feather Icons  -->
+    <!-- Favicons -->
+    <link
+      rel="icon"
+      href="img/favicon-32x32.png"
+      type="image/png"
+      sizes="32x32"
+    />
+    <link rel="icon" href="img/favicon.png" type="image/png" />
+
+    <!-- Feather Icons -->
     <script src="https://unpkg.com/feather-icons"></script>
 
-    <!-- My Style -->
+    <!-- stylesheet: custom css -->
     <link rel="stylesheet" href="css/style.css" />
+
+    <!-- app script: load early for alpine init -->
+    <script src="src/app.js"></script>
+
+    <!-- alpine framework -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+
+    <!-- sweetalert2: professional alert dialogs -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
 
   <body>
-    <!-- Navbar start -->
-    <nav class="navbar">
-      <a href="#" class="navbar-logo">Kenangan<span>senja</span>.</a>
+    <!-- toast: cart confirmation feedback -->
+    <div
+      id="toast-notification"
+      x-data
+      x-show="$store.ui.toastVisible"
+      x-text="$store.ui.toastMessage"
+      x-transition:enter="toast-enter"
+      x-transition:enter-start="toast-enter-start"
+      x-transition:enter-end="toast-enter-end"
+      x-transition:leave="toast-leave"
+      x-transition:leave-start="toast-leave-start"
+      x-transition:leave-end="toast-leave-end"
+      class="toast-notification"
+      role="status"
+      aria-live="polite"
+    ></div>
 
-      <div class="navbar-nav">
-        <a href="#home">Home</a>
-        <a href="#about">Tentang Kami</a>
-        <a href="#menu">Menu</a>
-        <a href="#contact">Kontak</a>
+    <!-- fallback toast: plain notifications -->
+    <div id="app-toast" class="app-toast" aria-live="assertive"></div>
+
+    <!-- active overlay backdrop -->
+    <div
+      class="active-overlay"
+      x-data
+      x-show="$store.ui.isCartOpen || $store.ui.isNavOpen"
+      @click="$store.ui.closeAll()"
+      x-transition:enter="overlay-fade-enter"
+      x-transition:enter-start="overlay-fade-enter-start"
+      x-transition:enter-end="overlay-fade-enter-end"
+      x-transition:leave="overlay-fade-leave"
+      x-transition:leave-start="overlay-fade-leave-start"
+      x-transition:leave-end="overlay-fade-leave-end"
+      style="display: none"
+    ></div>
+
+    <!-- navbar: main header & toggle links -->
+    <nav class="navbar" x-data role="navigation" aria-label="Navigasi Utama">
+      <a
+        href="#home"
+        class="navbar-logo"
+        aria-label="Kenangan Senja - Halaman Utama"
+      >
+        Kenangan<span>Senja</span>
+      </a>
+
+      <!-- navigation links -->
+      <div
+        class="navbar-nav"
+        :class="{ 'active': $store.ui.isNavOpen }"
+        @click.outside="$store.ui.closeIfOutside($event, 'nav')"
+        role="menubar"
+      >
+        <a href="#home" role="menuitem">Home</a>
+        <a href="#about" role="menuitem">Tentang Kami</a>
+        <a href="#menu" role="menuitem">Menu</a>
+        <a href="#products" role="menuitem">Produk</a>
+        <a href="#contact" role="menuitem">Kontak</a>
       </div>
 
+      <!-- action buttons -->
       <div class="navbar-extra">
-        <a href="#" id="search"><i data-feather="search"></i></a>
-        <a href="#" id="shopping-cart"><i data-feather="shopping-cart"></i></a>
-        <a href="#" id="hamburger-menu"><i data-feather="menu"></i></a>
-      </div>
-    </nav>
-    <!-- Navbar end -->
+        <!-- search trigger -->
+        <a
+          href="#"
+          id="search-button"
+          @click.prevent.stop="$store.ui.toggleSearch()"
+          aria-label="Buka pencarian"
+          aria-expanded="$store.ui.isSearchOpen"
+          role="button"
+        >
+          <i data-feather="search" aria-hidden="true"></i>
+        </a>
 
-    <!-- Hero section start -->
-    <section class="hero" id="home">
-      <main class="content">
-        <h1>Mari Nikmati Secangkir <span>Kopi</span></h1>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto,
-          similique!
+        <!-- cart trigger -->
+        <a
+          href="#"
+          id="shopping-cart-button"
+          @click.prevent.stop="$store.ui.toggleCart()"
+          aria-label="Buka keranjang belanja"
+          aria-expanded="$store.ui.isCartOpen"
+          role="button"
+        >
+          <i data-feather="shopping-cart" aria-hidden="true"></i>
+          <span
+            class="quantity-badge"
+            x-show="$store.cart.quantity > 0"
+            x-text="$store.cart.quantity"
+            aria-label="Jumlah item di keranjang"
+          ></span>
+        </a>
+
+        <!-- mobile hamburger trigger -->
+        <a
+          href="#"
+          id="hamburger-menu"
+          @click.prevent.stop="$store.ui.toggleNav()"
+          aria-label="Buka menu navigasi"
+          aria-expanded="$store.ui.isNavOpen"
+          role="button"
+        >
+          <i data-feather="menu" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <!-- search form: auto focus on open -->
+      <div
+        class="search-form"
+        :class="{ 'active': $store.ui.isSearchOpen }"
+        x-effect="if ($store.ui.isSearchOpen) $nextTick(() => $el.querySelector('input')?.focus())"
+        @click.outside="$store.ui.closeIfOutside($event, 'search')"
+        role="search"
+      >
+        <input
+          type="search"
+          id="search-box"
+          placeholder="Cari kopi favoritmu..."
+          autocomplete="off"
+          aria-label="Kolom pencarian kopi"
+          x-model="$store.ui.searchQuery"
+        />
+        <label for="search-box" aria-label="Cari">
+          <i data-feather="search" aria-hidden="true"></i>
+        </label>
+
+        <!-- live search results dropdown -->
+        <div
+          class="search-dropdown"
+          x-show="$store.ui.searchQuery.trim().length > 0"
+          x-transition:enter="dropdown-enter"
+          x-transition:enter-start="dropdown-enter-start"
+          x-transition:enter-end="dropdown-enter-end"
+          x-transition:leave="dropdown-leave"
+          x-transition:leave-start="dropdown-leave-start"
+          x-transition:leave-end="dropdown-leave-end"
+          x-cloak
+        >
+          <!-- if results found -->
+          <template x-if="$store.ui.searchResults.length > 0">
+            <div class="search-results-list">
+              <template x-for="item in $store.ui.searchResults" :key="item.id">
+                <div class="search-result-item">
+                  <img
+                    :src="`img/products/${item.img}`"
+                    :alt="item.name"
+                    width="50"
+                    height="50"
+                  />
+                  <div class="search-result-info">
+                    <h4
+                      x-html="$store.ui.highlightMatch(item.name, $store.ui.searchQuery)"
+                    ></h4>
+                    <p x-text="rupiah(item.price)"></p>
+                  </div>
+                  <div class="search-result-actions">
+                    <button
+                      type="button"
+                      class="search-action-btn"
+                      @click.prevent="$store.ui.openModal(item); $store.ui.isSearchOpen = false; $store.ui.searchQuery = ''"
+                      title="Lihat Detail"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <use href="img/feather-sprite.svg#eye" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="search-action-btn add-btn"
+                      @click.prevent="$store.cart.add(item)"
+                      title="Tambah ke Keranjang"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <use href="img/feather-sprite.svg#shopping-cart" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </template>
+
+          <!-- if no results -->
+          <template x-if="$store.ui.searchResults.length === 0">
+            <div class="search-no-result">
+              <p>
+                Produk "<span x-text="$store.ui.searchQuery"></span>" tidak
+                ditemukan.
+              </p>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- cart: sidebar pane -->
+      <div
+        class="shopping-cart"
+        :class="{ 'active': $store.ui.isCartOpen }"
+        @click.outside="$store.ui.closeIfOutside($event, 'cart')"
+        role="region"
+        aria-label="Keranjang Belanja"
+      >
+        <!-- cart items loop -->
+        <template x-for="(item, index) in $store.cart.items" :key="item.id">
+          <div class="cart-item">
+            <img
+              :src="`img/products/${item.img}`"
+              :alt="item.name"
+              loading="lazy"
+              width="60"
+              height="60"
+            />
+            <div class="item-detail">
+              <h3 x-text="item.name"></h3>
+              <div class="item-price">
+                <span x-text="rupiah(item.price)"></span> &times;
+                <button
+                  class="qty-btn"
+                  @click="$store.cart.remove(item.id)"
+                  :aria-label="`Kurangi jumlah ${item.name}`"
+                >
+                  &minus;
+                </button>
+                <span x-text="item.quantity" aria-label="Jumlah"></span>
+                <button
+                  class="qty-btn"
+                  @click="$store.cart.add(item)"
+                  :aria-label="`Tambah jumlah ${item.name}`"
+                >
+                  &plus;
+                </button>
+                &equals;
+                <span x-text="rupiah(item.total)"></span>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- empty cart placeholder -->
+        <p
+          x-show="!$store.cart.items.length"
+          class="cart-empty"
+          aria-live="polite"
+        >
+          <i data-feather="shopping-bag" aria-hidden="true"></i>
+          Keranjang masih kosong
         </p>
-        <a href="#" class="cta">Beli Sekarang</a>
+
+        <!-- cart summary & actions -->
+        <template x-if="$store.cart.items.length">
+          <div class="cart-summary">
+            <h4>Total: <span x-text="rupiah($store.cart.total)"></span></h4>
+
+            <!-- clear cart action -->
+            <button
+              type="button"
+              class="clear-cart-btn"
+              @click="$store.cart.clearWithConfirm()"
+              aria-label="Kosongkan seluruh keranjang belanja"
+            >
+              <i data-feather="trash-2" aria-hidden="true"></i> Kosongkan
+            </button>
+          </div>
+        </template>
+
+        <!-- customer checkout details -->
+        <div
+          class="form-container"
+          x-data="checkoutForm"
+          x-show="$store.cart.items.length"
+        >
+          <form @submit.prevent="submitCheckout()" id="checkoutForm" novalidate>
+            <!-- hidden cart fields -->
+            <input
+              type="hidden"
+              name="items"
+              :value="JSON.stringify($store.cart.items)"
+            />
+            <input type="hidden" name="total" :value="$store.cart.total" />
+
+            <h5>Data Pelanggan</h5>
+
+            <label for="name">
+              <span>Nama Lengkap</span>
+              <input
+                type="text"
+                name="name"
+                id="name"
+                placeholder="Nama Lengkap"
+                autocomplete="name"
+                required
+                minlength="2"
+                x-model="name"
+              />
+            </label>
+
+            <label for="email">
+              <span>Email</span>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                placeholder="email@contoh.com"
+                autocomplete="email"
+                required
+                x-model="email"
+              />
+            </label>
+
+            <label for="phone">
+              <span>No. HP (WhatsApp)</span>
+              <input
+                type="tel"
+                name="phone"
+                id="phone"
+                autocomplete="tel"
+                placeholder="08xxxxxxxxxx"
+                required
+                x-model="phone"
+                x-on:input="phone = phone.replace(/[^0-9]/g, '')"
+              />
+            </label>
+
+            <button
+              class="checkout-button"
+              :class="{ 'disabled': !isValid || isCooldown }"
+              :disabled="!isValid || isCooldown"
+              type="submit"
+              id="checkout-button"
+              aria-label="Kirim pesanan ke WhatsApp"
+            >
+              <i data-feather="message-circle" aria-hidden="true"></i>
+              <span
+                x-text="isCooldown ? `Mengirim (${cooldownTime})...` : 'Checkout via WhatsApp'"
+              ></span>
+            </button>
+          </form>
+        </div>
+      </div>
+      <!-- cart sidebar end -->
+    </nav>
+    <!-- navbar end -->
+
+    <!-- hero: intro landing section -->
+    <section class="hero" id="home" aria-labelledby="hero-title">
+      <div class="mask-container" aria-hidden="true"></div>
+      <main class="content">
+        <h1 id="hero-title">Kenikmatan dalam Setiap <span>Tegukan</span></h1>
+        <a
+          href="#products"
+          class="cta"
+          aria-label="Lihat produk dan pesan sekarang"
+        >
+          Beli Sekarang
+        </a>
       </main>
     </section>
-    <!-- Hero section end -->
 
-    <!-- About section start -->
-    <section id="about" class="about">
-      <h2><span>Tentang</span> Kami</h2>
+    <!-- about: cafe profile -->
+    <section id="about" class="about" aria-labelledby="about-title">
+      <h2 id="about-title"><span>Tentang</span> Kami</h2>
 
       <div class="row">
         <div class="about-img">
-          <img src="img/tentang-kami.jpg" alt="Tentang Kami" />
+          <img
+            src="img/tentang-kami.jpg"
+            alt="Barista Kenangan Senja sedang meracik kopi terbaik"
+            loading="lazy"
+            width="600"
+            height="450"
+          />
         </div>
         <div class="content">
-          <h3>Kenapa Memilih Kopi Kami</h3>
+          <h3>Kenapa Memilih <span>Kopi</span> Kami?</h3>
           <p>
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Numquam
-            accusantium sunt omnis consectetur, repellendus quam.
+            Karena setiap tegukan kopi kami adalah hasil dari perpaduan biji
+            kopi pilihan yang diproses dengan cinta dan keahlian.
           </p>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi
-            quaerat unde dolorum eum necessitatibus. Dicta tempore dolor minima
-            hic earum.
+            Dari petani hingga cangkir Anda, kami memastikan kualitas terbaik,
+            rasa yang mendalam, dan aroma yang memikat. Kopi kami bukan sekadar
+            minuman, tetapi pengalaman yang menyatukan kenikmatan dan tradisi
+            dalam setiap seruput.
           </p>
         </div>
       </div>
     </section>
-    <!-- About section end -->
 
-    <!-- Menu section start -->
-    <section id="menu" class="menu">
-      <h2><span>Menu</span> Kami</h2>
+    <!-- menu: quick list overview -->
+    <section
+      id="menu"
+      class="menu"
+      x-data="menuSection"
+      aria-labelledby="menu-title"
+    >
+      <h2 id="menu-title"><span>Menu</span> Kami</h2>
       <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci nobis
-        qui, quidem exercitationem numquam.
+        Temukan berbagai pilihan kopi terbaik kami. Setiap cangkir diracik untuk
+        kenikmatan Anda.
       </p>
 
       <div class="row">
-        <div class="menu-card">
-          <img src="img/menu/1.jpg" alt="Latte" class="menu-card-img" />
-          <h3 class="menu-card-title">-Latte-</h3>
-          <p class="menu-card-price">IDR 15k</p>
-        </div>
-        <div class="menu-card">
-          <img src="img/menu/1.jpg" alt="Latte" class="menu-card-img" />
-          <h3 class="menu-card-title">-Latte-</h3>
-          <p class="menu-card-price">IDR 15k</p>
-        </div>
-        <div class="menu-card">
-          <img src="img/menu/1.jpg" alt="Latte" class="menu-card-img" />
-          <h3 class="menu-card-title">-Latte-</h3>
-          <p class="menu-card-price">IDR 15k</p>
-        </div>
-        <div class="menu-card">
-          <img src="img/menu/1.jpg" alt="Latte" class="menu-card-img" />
-          <h3 class="menu-card-title">-Latte-</h3>
-          <p class="menu-card-price">IDR 15k</p>
+        <template x-for="item in items" :key="item.id">
+          <div class="menu-card">
+            <img
+              :src="`img/products/${item.img}`"
+              :alt="item.name"
+              class="menu-card-img"
+              loading="lazy"
+              width="120"
+              height="120"
+            />
+            <h3
+              class="menu-card-title"
+              x-html="$store.ui.highlightMatch(item.name, $store.ui.searchQuery)"
+            ></h3>
+            <p class="menu-card-price" x-text="rupiah(item.price)"></p>
           </div>
-        <div class="menu-card">
-          <img src="img/menu/1.jpg" alt="Latte" class="menu-card-img" />
-          <h3 class="menu-card-title">-Latte-</h3>
-          <p class="menu-card-price">IDR 15k</p>
+        </template>
+        <div x-show="items.length === 0" class="search-empty-state" x-cloak>
+          <p>
+            Menu dengan kata kunci "<span x-text="$store.ui.searchQuery"></span
+            >" tidak ditemukan.
+          </p>
+        </div>
       </div>
-        <div class="menu-card">
-          <img src="img/menu/1.jpg" alt="Latte" class="menu-card-img" />
-          <h3 class="menu-card-title">-Latte-</h3>
-          <p class="menu-card-price">IDR 15k</p>
-      </div>
-      </section>
-    <!-- Menu section end -->
+    </section>
 
-    <!-- Contact section start -->
-    <section id="contact" class="contact">
-      <h2><span>Kontak</span> Kami</h2>
+    <!-- products: detailed cards & add-to-cart actions -->
+    <section
+      class="products"
+      id="products"
+      x-data="products"
+      aria-labelledby="products-title"
+    >
+      <h2 id="products-title"><span>Produk</span> Unggulan Kami</h2>
       <p>
-        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Dolores,
-        deserunt.
+        Nikmati aroma dan rasa kopi terbaik dari biji pilihan kami, diproses
+        dengan penuh cinta.
       </p>
+
+      <div class="row">
+        <template x-for="(item, index) in items" :key="item.id">
+          <div
+            class="product-card"
+            :data-catalog-id="item.id"
+            :data-catalog-price="item.price"
+          >
+            <div class="product-icons">
+              <!-- add item to cart -->
+              <a
+                href="#"
+                @click.prevent="$store.cart.add(item)"
+                :aria-label="`Tambahkan ${item.name} ke keranjang`"
+                title="Tambah ke Keranjang"
+              >
+                <svg
+                  width="22"
+                  height="22"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <use href="img/feather-sprite.svg#shopping-cart" />
+                </svg>
+              </a>
+
+              <!-- open modal details -->
+              <a
+                href="#"
+                class="item-detail-button"
+                @click.prevent="$store.ui.openModal(item)"
+                :aria-label="`Lihat detail ${item.name}`"
+                title="Lihat Detail"
+              >
+                <svg
+                  width="22"
+                  height="22"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <use href="img/feather-sprite.svg#eye" />
+                </svg>
+              </a>
+            </div>
+
+            <div class="product-image">
+              <img
+                :src="`img/products/${item.img}`"
+                :alt="item.name"
+                loading="lazy"
+                width="300"
+                height="220"
+              />
+            </div>
+
+            <div class="product-content">
+              <h3
+                x-html="$store.ui.highlightMatch(item.name, $store.ui.searchQuery)"
+              ></h3>
+              <div class="product-stars" aria-label="Rating 5 dari 5 bintang">
+                <template x-for="s in 5" :key="s">
+                  <svg
+                    width="22"
+                    height="22"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <use href="img/feather-sprite.svg#star" />
+                  </svg>
+                </template>
+              </div>
+              <div class="product-price">
+                <span x-text="rupiah(item.price)"></span>
+              </div>
+            </div>
+          </div>
+        </template>
+        <div x-show="items.length === 0" class="search-empty-state" x-cloak>
+          <p>
+            Produk dengan kata kunci "<span
+              x-text="$store.ui.searchQuery"
+            ></span
+            >" tidak ditemukan.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- contact: map & support form -->
+    <section id="contact" class="contact" aria-labelledby="contact-title">
+      <h2 id="contact-title"><span>Kontak</span> Kami</h2>
+      <p>Butuh bantuan? Hubungi kami sekarang juga!</p>
 
       <div class="row">
         <iframe
@@ -136,54 +629,179 @@
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
           class="map"
+          title="Peta lokasi Kedai Kopi Kenangan Senja"
+          aria-label="Peta Lokasi Kedai Kopi Kenangan Senja di Bandung"
         ></iframe>
 
-        <form action="">
-          <div class="input-grup">
-            <i data-feather="user"></i>
-            <input type="text" placeholder="Nama" />
+        <!-- simple contact form -->
+        <form
+          action=""
+          id="contactForm"
+          novalidate
+          aria-label="Formulir Pesan Kontak"
+        >
+          <div class="input-group">
+            <i data-feather="user" aria-hidden="true"></i>
+            <input
+              type="text"
+              id="contact-name"
+              name="contact-name"
+              placeholder="Nama"
+              autocomplete="name"
+              required
+              aria-label="Nama lengkap"
+            />
           </div>
-          <div class="input-grup">
-            <i data-feather="mail"></i>
-            <input type="text" placeholder="Email" />
+          <div class="input-group">
+            <i data-feather="mail" aria-hidden="true"></i>
+            <input
+              type="email"
+              id="contact-email"
+              name="contact-email"
+              placeholder="Email"
+              autocomplete="email"
+              required
+              aria-label="Alamat email"
+            />
           </div>
-          <div class="input-grup">
-            <i data-feather="phone"></i>
-            <input type="text" placeholder="No HP" />
+          <div class="input-group">
+            <i data-feather="phone" aria-hidden="true"></i>
+            <input
+              type="tel"
+              id="contact-phone"
+              name="contact-phone"
+              placeholder="No. HP"
+              autocomplete="tel"
+              required
+              aria-label="Nomor handphone"
+            />
           </div>
-          <button type="submit" class="btn">Kirim Pesan</button>
+          <button type="submit" class="btn" aria-label="Kirim pesan">
+            Kirim Pesan
+          </button>
         </form>
       </div>
     </section>
-    <!-- Contact section end -->
 
-    <!-- Footer Start -->
-<footer>
-  <div class="socials">
-    <a href="#"><i data-feather="instagram"></i></a>
-    <a href="#"><i data-feather="twitter"></i></a>
-    <a href="#"><i data-feather="facebook"></i></a>
-  </div>
+    <!-- footer: social links & copyright -->
+    <footer role="contentinfo">
+      <div class="socials" aria-label="Media Sosial Kenangan Senja">
+        <a
+          href="https://www.instagram.com"
+          aria-label="Instagram"
+          rel="noopener noreferrer"
+        >
+          <i data-feather="instagram" aria-hidden="true"></i>
+        </a>
+        <a
+          href="https://www.twitter.com"
+          aria-label="Twitter"
+          rel="noopener noreferrer"
+        >
+          <i data-feather="twitter" aria-hidden="true"></i>
+        </a>
+        <a
+          href="https://www.facebook.com"
+          aria-label="Facebook"
+          rel="noopener noreferrer"
+        >
+          <i data-feather="facebook" aria-hidden="true"></i>
+        </a>
+      </div>
 
-  <div class="links">
-    <a href="#home">Home</a>
-    <a href="#about">Tentang Kami</a>
-    <a href="#menu">Menu</a>
-    <a href="#contac">Kontak</a>
-  </div>
+      <nav class="links" aria-label="Navigasi Footer">
+        <a href="#home">Home</a>
+        <a href="#about">Tentang Kami</a>
+        <a href="#menu">Menu</a>
+        <a href="#contact">Kontak</a>
+      </nav>
 
-  <div class="credit">
-    <p>Created by <a href="">deidengsaragih</a>. | &copy; 2024.</p>
-  </div>
-</footer>
+      <div class="credit">
+        <p>
+          Dibuat dengan ☕ oleh
+          <a href="https://www.instagram.com/deisaragih69_">deidengsaragih</a>.
+          | &copy; 2024 Kenangan Senja.
+        </p>
+      </div>
+    </footer>
 
-    <!-- Footer End -->
+    <!-- modal: dynamic item details dialog -->
+    <div
+      id="item-detail-modal-overlay"
+      class="modal"
+      x-data
+      x-show="$store.ui.isModalOpen"
+      @click.self="$store.ui.closeModal()"
+      x-transition:enter="modal-fade-enter"
+      x-transition:enter-start="modal-fade-enter-start"
+      x-transition:enter-end="modal-fade-enter-end"
+      x-transition:leave="modal-fade-leave"
+      x-transition:leave-start="modal-fade-leave-start"
+      x-transition:leave-end="modal-fade-leave-end"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-product-title"
+      style="display: none"
+    >
+      <div class="modal-container" x-show="$store.ui.modalItem">
+        <!-- Close Button -->
+        <button
+          class="close-icon"
+          @click="$store.ui.closeModal()"
+          aria-label="Tutup detail produk"
+        >
+          <i data-feather="x" aria-hidden="true"></i>
+        </button>
 
+        <div class="modal-content" x-show="$store.ui.modalItem">
+          <img
+            :src="`img/products/${$store.ui.modalItem?.img}`"
+            :alt="$store.ui.modalItem?.name"
+            loading="lazy"
+            width="320"
+            height="320"
+          />
+          <div class="product-content">
+            <h3
+              id="modal-product-title"
+              x-text="$store.ui.modalItem?.name"
+            ></h3>
+            <p x-text="$store.ui.modalItem?.description"></p>
+
+            <div class="product-stars" aria-label="Rating 5 bintang">
+              <template x-for="s in 5" :key="s">
+                <i data-feather="star" aria-hidden="true"></i>
+              </template>
+            </div>
+
+            <div class="product-price">
+              <span x-text="rupiah($store.ui.modalItem?.price)"></span>
+            </div>
+
+            <!-- add to cart from modal -->
+            <a
+              href="#"
+              @click.prevent="$store.cart.add($store.ui.modalItem); $store.ui.closeModal();"
+              aria-label="Tambahkan ke keranjang belanja"
+              class="modal-add-btn"
+            >
+              <i data-feather="shopping-cart" aria-hidden="true"></i>
+              <span>Tambah ke Keranjang</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- modal end -->
+
+    <!-- feather icons initialize -->
     <script>
-      feather.replace();
+      document.addEventListener("DOMContentLoaded", () => {
+        feather.replace();
+      });
     </script>
 
-    <!-- My Javascript -->
+    <!-- legacy jquery-like scripts -->
     <script src="js/script.js"></script>
   </body>
 </html>
