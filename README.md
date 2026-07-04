@@ -19,7 +19,6 @@
 
 ### ⚡ 2. Interaktivitas & Reaktivitas Modern (Alpine.js)
 
-- **Skeleton Loading Animation**: Animasi _shimmer_ dan _pulse_ mewah yang tampil saat pemuatan awal atau ketika penyaringan produk dilakukan, memberikan visual feedback yang profesional tanpa _layout shift_.
 - **Live Search & Highlighting**: Pencarian instan di seluruh katalog (berdasarkan nama, deskripsi, atau kategori) dengan fitur penyorotan kata kunci (_highlight match_) pada hasil pencarian.
 - **Filter Kategori Dinamis**: Navigasi tab untuk menyaring produk secara cepat (✨ _Semua_, ☕ _Coffee_, 🥛 _Milk Based_, 🍫 _Non-Coffee_).
 
@@ -54,7 +53,7 @@ c:\Users\User\Documents\Kedai Kopi\
 │
 ├── index.html           # Struktur utama halaman web & template Alpine.js
 ├── css/
-│   └── style.css        # Sistem desain kustom (Glassmorphism, Skeleton, Responsive)
+│   └── style.css        # Sistem desain kustom (Glassmorphism, Responsive)
 ├── js/
 │   └── script.js        # Interaksi DOM aksesibilitas (Tombol Esc, klik backdrop)
 ├── src/
